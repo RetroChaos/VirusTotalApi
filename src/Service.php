@@ -3,6 +3,7 @@
 namespace RetroChaos\VirusTotalApi;
 
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Helpers\FileHelper;
 
 class Service
 {
@@ -12,7 +13,7 @@ class Service
 	private HttpClient $_httpClient;
 
 	/**
-	 * Constructor
+	 * The main service class handling API calls.
 	 * @param HttpClient $httpClient
 	 */
 	public function __construct(HttpClient $httpClient)
@@ -37,7 +38,7 @@ class Service
 	 */
 	public function scanFile(string $filePath, ?string $password = null): array
 	{
-		$fileHandler = new FileScanner();
+		$fileHandler = new FileHelper();
 		if (!$fileHandler->isFileSizeValid($filePath)) {
 			return [
 				'success' => false,
@@ -61,7 +62,7 @@ class Service
 	 * @return string
 	 * @throws PropertyNotFoundException
 	 */
-	public function getAnalysisId(array $response): string
+	public function getFileAnalysisId(array $response): string
 	{
 		if (!isset($response['data']['id'])) {
 			throw new PropertyNotFoundException("No analysis ID found!");
@@ -80,115 +81,8 @@ class Service
 		return $this->_httpClient->request('GET', "analyses/$analysisId");
 	}
 
-	/**
-	 * Returns a simple bool if both the malicious and suspicious counts are zero.
-	 * @param array $report
-	 * @return bool
-	 */
-	public function isFileSafe(array $report): bool
+	public function scanIpAddress(string $ipAddress): array
 	{
-		try {
-			return !($this->getMaliciousCount($report) > 0 || $this->getSuspiciousCount($report) > 0);
-		} catch (PropertyNotFoundException $e) {
-			return false;
-		}
-	}
-
-	/**
-	 * @param array $report
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	public function getMaliciousCount(array $report): int
-	{
-		if (!isset($report['data']['attributes']['stats']['malicious'])) {
-			throw new PropertyNotFoundException("Malicious count not set in the report!");
-		}
-
-		return $report['data']['attributes']['stats']['malicious'];
-	}
-
-	/**
-	 * @param array $report
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	public function getSuspiciousCount(array $report): int
-	{
-		if (!isset($report['data']['attributes']['stats']['suspicious'])) {
-			throw new PropertyNotFoundException("Suspicious count not set in the report!");
-		}
-
-		return $report['data']['attributes']['stats']['suspicious'];
-	}
-
-	/**
-	 * @param array $report
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	public function getUndetectedCount(array $report): int
-	{
-		if (!isset($report['data']['attributes']['stats']['undetected'])) {
-			throw new PropertyNotFoundException("Undetected count not set in the report!");
-		}
-
-		return $report['data']['attributes']['stats']['undetected'];
-	}
-
-	/**
-	 * @param array $report
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	public function getHarmlessCount(array $report): int
-	{
-		if (!isset($report['data']['attributes']['stats']['harmless'])) {
-			throw new PropertyNotFoundException("Harmless count not set in the report!");
-		}
-
-		return $report['data']['attributes']['stats']['harmless'];
-	}
-
-	/**
-	 * @param array $report
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	public function getTimeoutCount(array $report): int
-	{
-		if (!isset($report['data']['attributes']['stats']['timeout'])) {
-			throw new PropertyNotFoundException("Timeout count not set in the report!");
-		}
-
-		return $report['data']['attributes']['stats']['timeout'];
-	}
-
-	/**
-	 * @param array $report
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	public function getFailureCount(array $report): int
-	{
-		if (!isset($report['data']['attributes']['stats']['failure'])) {
-			throw new PropertyNotFoundException("Failure count not set in the report!");
-		}
-
-		return $report['data']['attributes']['stats']['failure'];
-	}
-
-	/**
-	 * @param array $report
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	public function getTypeUnsupportedCount(array $report): int
-	{
-		if (!isset($report['data']['attributes']['stats']['type-unsupported'])) {
-			throw new PropertyNotFoundException("Type Unsupported count not set in the report!");
-		}
-
-		return $report['data']['attributes']['stats']['type-unsupported'];
+		return $this->_httpClient->request('GET', "ip_addresses/$ipAddress");
 	}
 }

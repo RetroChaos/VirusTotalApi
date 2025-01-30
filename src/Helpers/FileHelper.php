@@ -1,8 +1,8 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi;
+namespace RetroChaos\VirusTotalApi\Helpers;
 
-class FileScanner
+class FileHelper
 {
 	private const MAX_FILE_SIZE_MB = 200;
 	private const LARGE_FILE_SIZE_MB = 32;

@@ -2,6 +2,7 @@
 
 require 'vendor/autoload.php';
 
+use RetroChaos\VirusTotalApi\Analysers\FileAnalyser;
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\HttpClient;
 use RetroChaos\VirusTotalApi\Service;
@@ -16,9 +17,10 @@ if ($response['success']) {
 	try {
 		// We can get the analysis ID from the response of the file scan,
 		// otherwise you can always manually enter an ID to get the report.
-		$id = $virusTotal->getAnalysisId($response);
+		$id = $virusTotal->getFileAnalysisId($response);
 		$report = $virusTotal->getFileReport($id);
-		echo $virusTotal->isFileSafe($report) ? "File is safe!" : "File is malicious!";
+		$analyser = new FileAnalyser($report);
+		echo $analyser->isFileSafe() ? "File is safe!\n" : "File is malicious!\n";
 	} catch (PropertyNotFoundException $e) {
 		echo $e->getMessage();
 	}
