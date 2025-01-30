@@ -2,14 +2,26 @@
 
 require 'vendor/autoload.php';
 
-use RetroChaos\VirusTotal;
+use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\HttpClient;
+use RetroChaos\VirusTotalApi\Service;
 
-// Replace with your actual API Key
-$virusTotal = new VirusTotal('your-api-key');
+$httpClient = new HttpClient('your-api-key');
+$virusTotal = new Service($httpClient);
 
-$testFile = tempnam(sys_get_temp_dir(), 'vttest');
-file_put_contents($testFile, str_repeat('A', 100));
+//Password optional
+$response = $virusTotal->scanFile('/path/to/file.zip');
 
-$result = $virusTotal->filePathScan($testFile);
-unlink($testFile);
-dd($virusTotal->isFileSafe($result));
+if ($response['success']) {
+	try {
+		// We can get the analysis ID from the response of the file scan,
+		// otherwise you can always manually enter an ID to get the report.
+		$id = $virusTotal->getAnalysisId($response);
+		$report = $virusTotal->getFileReport($id);
+		echo $virusTotal->isFileSafe($report) ? "File is safe!" : "File is malicious!";
+	} catch (PropertyNotFoundException $e) {
+		echo $e->getMessage();
+	}
+} else {
+	echo $response['message'];
+}
