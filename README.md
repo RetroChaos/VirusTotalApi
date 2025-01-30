@@ -8,29 +8,43 @@ Uses Guzzle6 or Guzzle7
 
 ## Install
 
-TODO: Setup a packagist repository.
-
 Install using [composer](https://getcomposer.org/)
+
+```sh
+composer install retrochaos/virustotal-api
+```
 
 ## Usage
 
 Example script modified from ```test/debug.php```
 
 ```php
-use RetroChaos\VirusTotal;
+use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\HttpClient;
+use RetroChaos\VirusTotalApi\Service;
 
-// Replace with your actual API Key.
-$virusTotal = new VirusTotal('your-api-key');
+$httpClient = new HttpClient('your-api-key');
+$virusTotal = new Service($httpClient);
 
-//Password is optional for password-protected zip files.
-$result = $virusTotal->filePathScan('/path/to/file');
+//Password optional
+$response = $virusTotal->scanFile('/path/to/file.zip');
 
-//Boolean returned.
-return $virusTotal->isFileSafe($result);
+if ($response['success']) {
+	try {
+	    // We can get the analysis ID from the response of the file scan,
+	    // otherwise you can always manually enter an ID to get the report.
+		$id = $virusTotal->getAnalysisId($response);
+		$report = $virusTotal->getFileReport($id);
+		echo $virusTotal->isFileSafe($report) ? "File is safe!" : "File is malicious!";
+	} catch (PropertyNotFoundException $e) {
+		echo $e->getMessage();
+	}
+} else {
+	echo $response['message'];
+}
 ```
 
 ## TODO
 
-- Create a packagist repository so this can be installed as a composer dependency.
 - Add other methods found in the API
 - POST file data to the endpoint, not just filesystem paths.
