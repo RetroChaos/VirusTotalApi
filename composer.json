@@ -1,0 +1,25 @@
+{
+    "name": "retrochaos/virustotal-api",
+    "description": "A PHP library for using VirusTotal's API",
+    "type": "library",
+    "require": {
+        "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.0",
+        "ext-json": "*"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "RetroChaos\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "RetroChaos",
+            "email": "fc@retrochaos.com"
+        }
+    ],
+    "require-dev": {
+        "symfony/var-dumper": "^6.4"
+    }
+}
