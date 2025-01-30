@@ -4,7 +4,7 @@ A PHP library for accessing the [VirusTotal API](https://docs.virustotal.com/ref
 
 Based off of work done by [IzzySoft](https://github.com/IzzySoft/virustotal/) and [jayzeng](https://github.com/jayzeng/virustotal_apiwrapper/).
 
-Requires Guzzle7
+Uses Guzzle6 or Guzzle7
 
 ## Install
 
