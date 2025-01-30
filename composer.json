@@ -6,7 +6,8 @@
         "php": "^7.4 || ^8.1",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "ext-json": "*",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "nesbot/carbon": "^2.0 || ^3.0"
     },
     "license": "MIT",
     "autoload": {

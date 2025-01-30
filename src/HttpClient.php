@@ -18,7 +18,7 @@ class HttpClient
 	private Client $_client;
 
 	/**
-	 * Constructor
+	 * A wrapper for the main Guzzle Client.
 	 * @param string $apiKey
 	 */
 	public function __construct(string $apiKey)
