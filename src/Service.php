@@ -4,6 +4,10 @@ namespace RetroChaos\VirusTotalApi;
 
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\Helpers\FileHelper;
+use RetroChaos\VirusTotalApi\Responses\DomainResponse;
+use RetroChaos\VirusTotalApi\Responses\FileReportResponse;
+use RetroChaos\VirusTotalApi\Responses\FileResponse;
+use RetroChaos\VirusTotalApi\Responses\IpAddressResponse;
 
 class Service
 {
@@ -32,18 +36,30 @@ class Service
 	}
 
 	/**
+	 * Gets the analysis report of a file.
+	 * @param string $analysisId
+	 * @return FileReportResponse
+	 */
+	public function getFileReport(string $analysisId): FileReportResponse
+	{
+		$response = $this->_httpClient->request('GET', "analyses/$analysisId");
+		if ($response['success']) {
+			return new FileReportResponse($response);
+		} else {
+			return new FileReportResponse(null, false, $response['message']);
+		}
+	}
+
+	/**
 	 * @param string $filePath
 	 * @param string|null $password
-	 * @return array
+	 * @return FileReportResponse
 	 */
-	public function scanFile(string $filePath, ?string $password = null): array
+	public function scanFile(string $filePath, ?string $password = null): FileReportResponse
 	{
 		$fileHandler = new FileHelper();
 		if (!$fileHandler->isFileSizeValid($filePath)) {
-			return [
-				'success' => false,
-				'message' => "File size too large. Max 200MB allowed.",
-			];
+			return new FileReportResponse(null, false, 'File size too large. Max 200MB allowed.');
 		}
 
 		$uploadUrl = 'files';
@@ -51,38 +67,48 @@ class Service
 			$uploadUrl = $this->getLargeUploadUrl();
 		}
 
-		return $this->_httpClient->request('POST', $uploadUrl, [
+		$response = $this->_httpClient->request('POST', $uploadUrl, [
 			'multipart' => $fileHandler->prepareMultipartData($filePath, $password),
 		]);
-	}
 
-	/**
-	 * Gets the analysis ID for a scanned file.
-	 * @param array $response
-	 * @return string
-	 * @throws PropertyNotFoundException
-	 */
-	public function getFileAnalysisId(array $response): string
-	{
-		if (!isset($response['data']['id'])) {
-			throw new PropertyNotFoundException("No analysis ID found!");
+		if ($response['success']) {
+			$fileResponse = new	FileResponse($response);
+		} else {
+			return new FileReportResponse(null, false, $response['message']);
 		}
 
-		return $response['data']['id'];
+		try {
+			return $this->getFileReport($fileResponse->getFileAnalysisId());
+		} catch (PropertyNotFoundException $e) {
+			return new FileReportResponse(null, false, 'File report not found!');
+		}
 	}
 
 	/**
-	 * Gets the analysis report of a file.
-	 * @param string $analysisId
-	 * @return array
+	 * @param string $ipAddress
+	 * @return IpAddressResponse
 	 */
-	public function getFileReport(string $analysisId): array
+	public function scanIpAddress(string $ipAddress): IpAddressResponse
 	{
-		return $this->_httpClient->request('GET', "analyses/$analysisId");
+		$response = $this->_httpClient->request('GET', "ip_addresses/$ipAddress");
+		if ($response['success']) {
+			return new IpAddressResponse($response);
+		} else {
+			return new IpAddressResponse(null, false, $response['message']);
+		}
 	}
 
-	public function scanIpAddress(string $ipAddress): array
+	/**
+	 * @param string $domain
+	 * @return DomainResponse
+	 */
+	public function scanDomain(string $domain): DomainResponse
 	{
-		return $this->_httpClient->request('GET', "ip_addresses/$ipAddress");
+		$response = $this->_httpClient->request('GET', "domains/$domain");
+		if ($response['success']) {
+			return new DomainResponse($response);
+		} else {
+			return new DomainResponse(null, false, $response['message']);
+		}
 	}
 }

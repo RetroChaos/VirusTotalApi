@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 
-use RetroChaos\VirusTotalApi\Analysers\IpAddressAnalyser;
+use RetroChaos\VirusTotalApi\Analysers\DomainAnalyser;
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\HttpClient;
 use RetroChaos\VirusTotalApi\Service;
@@ -10,12 +10,12 @@ use RetroChaos\VirusTotalApi\Service;
 $httpClient = new HttpClient('your-api-key');
 $virusTotal = new Service($httpClient);
 
-$response = $virusTotal->scanIpAddress('8.8.8.8');
+$response = $virusTotal->scanDomain('google.com');
 
 if ($response->isSuccessful()) {
 	try {
-		$analyser = new IpAddressAnalyser($response);
-		echo $analyser->isIpAddressSafe() ? "IP address is safe!\n" : "IP address is malicious!\n";
+		$analyser = new DomainAnalyser($response);
+		echo $analyser->isDomainSafe() ? "Domain is safe!\n" : "Domain is malicious!\n";
 		echo $analyser->getLastAnalysisDate() . "\n";
 	} catch (PropertyNotFoundException $e) {
 		echo $e->getMessage();

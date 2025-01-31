@@ -4,71 +4,28 @@ namespace RetroChaos\VirusTotalApi\Analysers;
 
 use Carbon\Carbon;
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Responses\IpAddressResponse;
 
-class IpAddressAnalyser
+class IpAddressAnalyser extends BaseAnalyser
 {
 	/**
-	 * @var array $_report
+	 * Only accepts IpAddressResponse to avoid passing in any array.
+	 * @param IpAddressResponse $report
 	 */
-	private array $_report;
-
-	/**
-	 * An object in which you can call aggregate data about the IP Address scanned.
-	 * @param array $report
-	 */
-	public function __construct(array $report)
+	public function __construct(IpAddressResponse $report)
 	{
-		$this->_report = $report;
+		$this->_report = $report->getRawResponse();
 	}
 
 	/**
-	 * In case you need to change the report response array but don't necessarily want to create a new analyser object.
-	 * @param array $report
+	 * In case you need to change the report response but don't necessarily want to create a new analyser object.
+	 * @param IpAddressResponse $report
 	 * @return $this
 	 */
-	public function setReport(array $report): self
+	public function setReport(IpAddressResponse $report): self
 	{
-		$this->_report = $report;
+		$this->_report = $report->getRawResponse();
 		return $this;
-	}
-
-	/**
-	 * @param string $key
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	private function _getStat(string $key): int
-	{
-		if (!isset($this->_report['data']['attributes']['last_analysis_stats'][$key])) {
-			throw new PropertyNotFoundException("$key count not found in the report!");
-		}
-		return $this->_report['data']['attributes']['last_analysis_stats'][$key];
-	}
-
-	/**
-	 * @param string $key
-	 * @return int|string|array
-	 * @throws PropertyNotFoundException
-	 */
-	private function _getAttribute(string $key)
-	{
-		if (!isset($this->_report['data']['attributes'][$key])) {
-			throw new PropertyNotFoundException("$key not found in the report!");
-		}
-		return $this->_report['data']['attributes'][$key];
-	}
-
-	/**
-	 * @param string $key
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	private function _getVotes(string $key): int
-	{
-		if (!isset($this->_report['data']['attributes']['total_votes'][$key])) {
-			throw new PropertyNotFoundException("$key not found in the report!");
-		}
-		return $this->_report['data']['attributes']['total_votes'][$key];
 	}
 
 	/**
@@ -90,7 +47,7 @@ class IpAddressAnalyser
 	 */
 	public function getMaliciousCount(): int
 	{
-		return $this->_getStat('malicious');
+		return $this->_getLastAnalysisStat('malicious');
 	}
 
 	/**
@@ -99,7 +56,7 @@ class IpAddressAnalyser
 	 */
 	public function getSuspiciousCount(): int
 	{
-		return $this->_getStat('suspicious');
+		return $this->_getLastAnalysisStat('suspicious');
 	}
 
 	/**
@@ -108,7 +65,7 @@ class IpAddressAnalyser
 	 */
 	public function getUndetectedCount(): int
 	{
-		return $this->_getStat('undetected');
+		return $this->_getLastAnalysisStat('undetected');
 	}
 
 	/**
@@ -117,7 +74,7 @@ class IpAddressAnalyser
 	 */
 	public function getHarmlessCount(): int
 	{
-		return $this->_getStat('harmless');
+		return $this->_getLastAnalysisStat('harmless');
 	}
 
 	/**
@@ -126,7 +83,7 @@ class IpAddressAnalyser
 	 */
 	public function getTimeoutCount(): int
 	{
-		return $this->_getStat('timeout');
+		return $this->_getLastAnalysisStat('timeout');
 	}
 
 	/**
@@ -239,6 +196,7 @@ class IpAddressAnalyser
 	}
 
 	/**
+	 * Returns an array of all the various scans and their results.
 	 * @throws PropertyNotFoundException
 	 * @return array
 	 */
