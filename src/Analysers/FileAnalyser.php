@@ -4,47 +4,8 @@ namespace RetroChaos\VirusTotalApi\Analysers;
 
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 
-class FileAnalyser
+class FileAnalyser extends BaseAnalyser
 {
-	/**
-	 * @var array $_report
-	 */
-	private array $_report;
-
-	/**
-	 * An object in which you can call aggregate data about the file scanned.
-	 * @param array $report
-	 */
-	public function __construct(array $report)
-	{
-		$this->_report = $report;
-	}
-
-	/**
-	 * In case you need to change the report response array but don't necessarily want to create a new analyser object.
-	 * @param array $report
-	 * @return $this
-	 */
-	public function setReport(array $report): self
-	{
-		$this->_report = $report;
-		return $this;
-	}
-
-	/**
-	 * Gets the stat of the report based on the key
-	 * @param string $key
-	 * @return int
-	 * @throws PropertyNotFoundException
-	 */
-	private function _getStat(string $key): int
-	{
-		if (!isset($this->_report['data']['attributes']['stats'][$key])) {
-			throw new PropertyNotFoundException("$key count not found in the report!");
-		}
-		return $this->_report['data']['attributes']['stats'][$key];
-	}
-
 	/**
 	 * Returns true if both malicious count and suspicious count is zero.
 	 * @return bool

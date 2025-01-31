@@ -85,4 +85,9 @@ class Service
 	{
 		return $this->_httpClient->request('GET', "ip_addresses/$ipAddress");
 	}
+
+	public function scanDomain(string $domain): array
+	{
+		return $this->_httpClient->request('GET', "domains/$domain");
+	}
 }
