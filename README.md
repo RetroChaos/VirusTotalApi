@@ -21,6 +21,9 @@ composer install retrochaos/virustotal-api
 3. The Service object will return back a Response object of that type eg. if you're calling: ```$service->scanDomain()``` a ```DomainResponse``` object will be returned. You can always call the ```getRawResponse()``` method on the object to get an associative array returned from Guzzle
 4. To aid with your code, each response comes with a dedicated Analyser class to call specific methods on the response that was returned. Eg. a DomainAnalyser object requires a DomainResponse object.
 
+To recap:
+HttpClient -> Service -> Response -> Analyser
+
 Example script modified from ```test/file-test.php```
 
 ```php
