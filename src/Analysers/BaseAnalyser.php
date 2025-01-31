@@ -65,4 +65,17 @@ class BaseAnalyser
 		}
 		return $this->_report['data']['attributes']['stats'][$key];
 	}
+
+	/**
+	 * @param string $key
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	protected function _getFileInfo(string $key): string
+	{
+		if (!isset($this->_report['meta']['file_info'][$key])) {
+			throw new PropertyNotFoundException("$key count not found in the report!");
+		}
+		return $this->_report['meta']['file_info'][$key];
+	}
 }

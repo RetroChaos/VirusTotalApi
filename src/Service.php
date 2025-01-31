@@ -11,6 +11,24 @@ use RetroChaos\VirusTotalApi\Responses\IpAddressResponse;
 
 class Service
 {
+	const HARMLESS_VOTE_BODY = [
+		"data" => [
+			"type" => "vote",
+			"attributes" => [
+				"verdict" => "harmless"
+			]
+		]
+	];
+
+	const MALICIOUS_VOTE_BODY = [
+		"data" => [
+			"type" => "vote",
+			"attributes" => [
+				"verdict" => "malicious"
+			]
+		]
+	];
+
 	/**
 	 * @var HttpClient $_httpClient
 	 */
@@ -110,5 +128,53 @@ class Service
 		} else {
 			return new DomainResponse(null, false, $response['message']);
 		}
+	}
+
+	/**
+	 * @param string $domain
+	 * @return void
+	 */
+	public function addHarmlessDomainVote(string $domain): void
+	{
+		$this->_httpClient->request('POST', "domains/$domain/votes", [
+			"body" => json_encode(self::HARMLESS_VOTE_BODY),
+			"headers" => ['Content-Type' => 'application/json'],
+		]);
+	}
+
+	/**
+	 * @param string $domain
+	 * @return void
+	 */
+	public function addMaliciousDomainVote(string $domain): void
+	{
+		$this->_httpClient->request('POST', "domains/$domain/votes", [
+			"body" => json_encode(self::MALICIOUS_VOTE_BODY),
+			"headers" => ['Content-Type' => 'application/json'],
+		]);
+	}
+
+	/**
+	 * @param string $ipAddress
+	 * @return void
+	 */
+	public function addHarmlessIpVote(string $ipAddress): void
+	{
+		$this->_httpClient->request('POST', "ip_addresses/$ipAddress/votes", [
+			"body" => json_encode(self::HARMLESS_VOTE_BODY),
+			"headers" => ['Content-Type' => 'application/json'],
+		]);
+	}
+
+	/**
+	 * @param string $ipAddress
+	 * @return void
+	 */
+	public function addMaliciousIpVote(string $ipAddress): void
+	{
+		$this->_httpClient->request('POST', "ip_addresses/$ipAddress/votes", [
+			"body" => json_encode(self::MALICIOUS_VOTE_BODY),
+			"headers" => ['Content-Type' => 'application/json'],
+		]);
 	}
 }
