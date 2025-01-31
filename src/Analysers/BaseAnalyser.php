@@ -12,25 +12,6 @@ class BaseAnalyser
 	protected array $_report;
 
 	/**
-	 * @param array $report
-	 */
-	public function __construct(array $report)
-	{
-		$this->_report = $report;
-	}
-
-	/**
-	 * In case you need to change the report response array but don't necessarily want to create a new analyser object.
-	 * @param array $report
-	 * @return $this
-	 */
-	public function setReport(array $report): self
-	{
-		$this->_report = $report;
-		return $this;
-	}
-
-	/**
 	 * @param string $key
 	 * @return int|string|array
 	 * @throws PropertyNotFoundException

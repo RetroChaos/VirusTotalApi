@@ -16,6 +16,11 @@ composer install retrochaos/virustotal-api
 
 ## Usage
 
+1. Firstly you need to instantiate a HttpClient object with your API key from VirusTotal (you can obtain one from creating an account for free).
+2. Then you create a new Service object with the HttpClient. This is the main object where requests are made, such as scanning files, domains and IPs.
+3. The Service object will return back a Response object of that type eg. if you're calling: ```$service->scanDomain()``` a ```DomainResponse``` object will be returned. You can always call the ```getRawResponse()``` method on the object to get an associative array returned from Guzzle
+4. To aid with your code, each response comes with a dedicated Analyser class to call specific methods on the response that was returned. Eg. a DomainAnalyser object requires a DomainResponse object.
+
 Example script modified from ```test/file-test.php```
 
 ```php
@@ -30,19 +35,11 @@ $virusTotal = new Service($httpClient);
 //Password optional
 $response = $virusTotal->scanFile('/path/to/file.zip');
 
-if ($response['success']) {
-	try {
-		// We can get the analysis ID from the response of the file scan,
-		// otherwise you can always manually enter an ID to get the report.
-		$id = $virusTotal->getFileAnalysisId($response);
-		$report = $virusTotal->getFileReport($id);
-		$analyser = new FileAnalyser($report);
-		echo $analyser->isFileSafe() ? "File is safe!\n" : "File is malicious!\n";
-	} catch (PropertyNotFoundException $e) {
-		echo $e->getMessage();
-	}
+if ($response->isSuccessful()) {
+	$analyser = new FileAnalyser($response);
+	echo $analyser->isFileSafe() ? "File is safe!\n" : "File is malicious!\n";
 } else {
-	echo $response['message'];
+	echo $response->getErrorMessage();
 }
 ```
 
@@ -58,10 +55,9 @@ use RetroChaos\VirusTotalApi\Service;
 $httpClient = new HttpClient('your-api-key');
 $virusTotal = new Service($httpClient);
 
-//Password optional
 $response = $virusTotal->scanIpAddress('8.8.8.8');
 
-if ($response['success']) {
+if ($response->isSuccessful()) {
 	try {
 		$analyser = new IpAddressAnalyser($response);
 		echo $analyser->isIpAddressSafe() ? "IP address is safe!\n" : "IP address is malicious!\n";
@@ -70,7 +66,7 @@ if ($response['success']) {
 		echo $e->getMessage();
 	}
 } else {
-	echo $response['message'];
+	echo $response->getErrorMessage();
 }
 ```
 

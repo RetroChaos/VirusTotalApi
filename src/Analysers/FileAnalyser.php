@@ -3,9 +3,30 @@
 namespace RetroChaos\VirusTotalApi\Analysers;
 
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Responses\FileReportResponse;
 
 class FileAnalyser extends BaseAnalyser
 {
+	/**
+	 * Only accepts FileReportResponse to avoid passing in any array.
+	 * @param FileReportResponse $report
+	 */
+	public function __construct(FileReportResponse $report)
+	{
+		$this->_report = $report->getRawResponse();
+	}
+
+	/**
+	 * In case you need to change the report response but don't necessarily want to create a new analyser object.
+	 * @param FileReportResponse $report
+	 * @return $this
+	 */
+	public function setReport(FileReportResponse $report): self
+	{
+		$this->_report = $report->getRawResponse();
+		return $this;
+	}
+
 	/**
 	 * Returns true if both malicious count and suspicious count is zero.
 	 * @return bool

@@ -13,17 +13,9 @@ $virusTotal = new Service($httpClient);
 //Password optional
 $response = $virusTotal->scanFile('/path/to/file.zip');
 
-if ($response['success']) {
-	try {
-		// We can get the analysis ID from the response of the file scan,
-		// otherwise you can always manually enter an ID to get the report.
-		$id = $virusTotal->getFileAnalysisId($response);
-		$report = $virusTotal->getFileReport($id);
-		$analyser = new FileAnalyser($report);
-		echo $analyser->isFileSafe() ? "File is safe!\n" : "File is malicious!\n";
-	} catch (PropertyNotFoundException $e) {
-		echo $e->getMessage();
-	}
+if ($response->isSuccessful()) {
+	$analyser = new FileAnalyser($response);
+	echo $analyser->isFileSafe() ? "File is safe!\n" : "File is malicious!\n";
 } else {
-	echo $response['message'];
+	echo $response->getErrorMessage();
 }

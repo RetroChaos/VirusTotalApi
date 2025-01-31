@@ -10,10 +10,9 @@ use RetroChaos\VirusTotalApi\Service;
 $httpClient = new HttpClient('your-api-key');
 $virusTotal = new Service($httpClient);
 
-//Password optional
 $response = $virusTotal->scanDomain('google.com');
 
-if ($response['success']) {
+if ($response->isSuccessful()) {
 	try {
 		$analyser = new DomainAnalyser($response);
 		echo $analyser->isDomainSafe() ? "Domain is safe!\n" : "Domain is malicious!\n";
@@ -22,5 +21,5 @@ if ($response['success']) {
 		echo $e->getMessage();
 	}
 } else {
-	echo $response['message'];
+	echo $response->getErrorMessage();
 }

@@ -4,9 +4,30 @@ namespace RetroChaos\VirusTotalApi\Analysers;
 
 use Carbon\Carbon;
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Responses\DomainResponse;
 
 class DomainAnalyser extends BaseAnalyser
 {
+	/**
+	 * Only accepts DomainResponse to avoid passing in any array.
+	 * @param DomainResponse $report
+	 */
+	public function __construct(DomainResponse $report)
+	{
+		$this->_report = $report->getRawResponse();
+	}
+
+	/**
+	 * In case you need to change the report response but don't necessarily want to create a new analyser object.
+	 * @param DomainResponse $report
+	 * @return $this
+	 */
+	public function setReport(DomainResponse $report): self
+	{
+		$this->_report = $report->getRawResponse();
+		return $this;
+	}
+
 	/**
 	 * Returns true if both malicious count and suspicious count is zero.
 	 * @return bool

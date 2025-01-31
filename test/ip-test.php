@@ -10,10 +10,9 @@ use RetroChaos\VirusTotalApi\Service;
 $httpClient = new HttpClient('your-api-key');
 $virusTotal = new Service($httpClient);
 
-//Password optional
 $response = $virusTotal->scanIpAddress('8.8.8.8');
 
-if ($response['success']) {
+if ($response->isSuccessful()) {
 	try {
 		$analyser = new IpAddressAnalyser($response);
 		echo $analyser->isIpAddressSafe() ? "IP address is safe!\n" : "IP address is malicious!\n";
@@ -22,5 +21,5 @@ if ($response['success']) {
 		echo $e->getMessage();
 	}
 } else {
-	echo $response['message'];
+	echo $response->getErrorMessage();
 }
