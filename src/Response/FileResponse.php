@@ -12,10 +12,10 @@ class FileResponse extends BaseResponse {
 	 */
 	public function getFileAnalysisId(): string
 	{
-		if (!isset($this->_response['data']['id'])) {
+		if (!isset($this->_contents['data']['id'])) {
 			throw new PropertyNotFoundException("No analysis ID found!");
 		}
 
-		return $this->_response['data']['id'];
+		return $this->_contents['data']['id'];
 	}
 }

@@ -17,7 +17,7 @@ class FileApi extends BaseApi
 	public function getLargeUploadUrl(): string
 	{
 		$response = $this->_httpClient->request('GET', 'files/upload_url');
-		return $response['success'] ? $response['data'] : '';
+		return $response['success'] ? $response['contents']['data'] : '';
 	}
 
 	/**
@@ -40,9 +40,9 @@ class FileApi extends BaseApi
 		]);
 
 		if ($response['success']) {
-			return new FileResponse($response['data'], $response['status_code']);
+			return new FileResponse($response['contents'], $response['status_code']);
 		} else {
-			return new FileResponse(null, $response['status_code'], false, $response['error_message'], $response['exception']);
+			return new FileResponse($response['contents'], $response['status_code'], $response['success'], $response['error_message'], $response['exception']);
 		}
 	}
 
@@ -55,13 +55,13 @@ class FileApi extends BaseApi
 	{
 		$response = $this->_httpClient->request('GET', "analyses/$analysisId");
 		if ($response['success']) {
-			return new FileReportResponse($response['data'], $response['status_code']);
+			return new FileReportResponse($response['contents'], $response['status_code']);
 		} else {
-			return new FileReportResponse(null, $response['status_code'], false, $response['error_message'], $response['exception']);
+			return new FileReportResponse($response['contents'], $response['status_code'], $response['success'], $response['error_message'], $response['exception']);
 		}
 	}
 
-	public function scanUntilCompleted(string $id, int $maxAttempts = 5, int $initialDelay = 0, int $step = 15): FileReportResponse
+	public function scanUntilCompleted(string $id, int $step = 15, int $maxAttempts = 5, int $initialDelay = 0): FileReportResponse
 	{
 		try {
 			$attempt = 0;
@@ -79,7 +79,7 @@ class FileApi extends BaseApi
 				}
 
 				++$attempt;
-				$delay = min($delay + $step, 60); // Exponential increase but capped at 60 seconds
+				$delay = min($delay + $step, 60); // Linear increase but capped at 60 seconds
 			} while ($attempt < $maxAttempts);
 
 			return new FileReportResponse(null, 408, false, 'Timeout waiting for file scan to complete', 'ScanTimeout');

@@ -10,9 +10,9 @@ class DomainApi extends BaseApi
 	{
 		$response = $this->_httpClient->request('GET', "domains/$domain");
 		if ($response['success']) {
-			return new DomainResponse($response['data'], $response['status_code']);
+			return new DomainResponse($response['contents'], $response['status_code']);
 		} else {
-			return new DomainResponse(null, $response['status_code'], false, $response['error_message'], $response['exception']);
+			return new DomainResponse($response['contents'], $response['status_code'], $response['success'], $response['error_message'], $response['exception']);
 		}
 	}
 

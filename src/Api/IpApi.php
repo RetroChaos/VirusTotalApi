@@ -10,9 +10,9 @@ class IpApi extends BaseApi
 	{
 		$response = $this->_httpClient->request('GET', "ip_addresses/$ipAddress");
 		if ($response['success']) {
-			return new IpAddressResponse($response['data'], $response['status_code']);
+			return new IpAddressResponse($response['contents'], $response['status_code']);
 		} else {
-			return new IpAddressResponse(null, $response['status_code'], false, $response['error_message'], $response['exception']);
+			return new IpAddressResponse($response['contents'], $response['status_code'], $response['success'], $response['error_message'], $response['exception']);
 		}
 	}
 

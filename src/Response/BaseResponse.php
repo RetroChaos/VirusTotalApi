@@ -5,9 +5,9 @@ namespace RetroChaos\VirusTotalApi\Response;
 class BaseResponse
 {
 	/**
-	 * @var array|null $_data
+	 * @var array|null $_contents
 	 */
-	protected ?array $_data;
+	protected ?array $_contents;
 
 	/**
 	 * @var int $_status
@@ -38,7 +38,7 @@ class BaseResponse
 	 */
 	public function __construct(?array $data, int $status, bool $success = true, ?string $message = null, ?string $exception = null)
 	{
-		$this->_data = $data;
+		$this->_contents = $data;
 		$this->_status = $status;
 		$this->_success = $success;
 		$this->_error_message = $message;
@@ -50,7 +50,7 @@ class BaseResponse
 	 */
 	public function getRawData(): ?array
 	{
-		return $this->_data;
+		return $this->_contents;
 	}
 
 	/**
@@ -58,7 +58,7 @@ class BaseResponse
 	 */
 	public function getJsonData(): string
 	{
-		return json_encode($this->_data);
+		return json_encode($this->_contents);
 	}
 
 	/**

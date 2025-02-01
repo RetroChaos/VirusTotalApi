@@ -33,7 +33,7 @@ class BaseAnalyser
 	protected function _getVotes(string $key): int
 	{
 		if (!isset($this->_report['data']['attributes']['total_votes'][$key])) {
-			throw new PropertyNotFoundException("$key not found in the report!");
+			throw new PropertyNotFoundException("$key count not found in the report!");
 		}
 
 		return $this->_report['data']['attributes']['total_votes'][$key];
@@ -74,7 +74,7 @@ class BaseAnalyser
 	protected function _getFileInfo(string $key): string
 	{
 		if (!isset($this->_report['meta']['file_info'][$key])) {
-			throw new PropertyNotFoundException("$key count not found in the report!");
+			throw new PropertyNotFoundException("$key not found in the report!");
 		}
 		return $this->_report['meta']['file_info'][$key];
 	}

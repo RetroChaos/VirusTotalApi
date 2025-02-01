@@ -17,9 +17,9 @@ composer install retrochaos/virustotal-api
 ## Usage
 
 1. Firstly you need to instantiate a HttpClient object with your API key from VirusTotal (you can obtain one from creating an account for free).
-2. Then you create a new Service object with the HttpClient. This is the main object where requests are made, such as scanning files, domains and IPs.
+2. Then you create a new Service object with the HttpClient. This is the main object where requests are made, such as scanning files, domains and IPs. Behind the scenes API objects are actually making the calls.
 3. The Service object will return back a Response object of that type eg. if you're calling: ```$service->scanDomain()``` a ```DomainResponse``` object will be returned. You can always call the ```getRawResponse()``` method on the object to get an associative array returned from Guzzle
-4. To aid with your code, each response comes with a dedicated Analyser class to call specific methods on the response that was returned. Eg. a DomainAnalyser object requires a DomainResponse object.
+4. To aid with your code, each response comes with a dedicated Analyser class to call specific methods on the response that was returned, e.g. a DomainAnalyser object requires a DomainResponse object.
 
 To recap:
 HttpClient -> Service -> Response -> Analyser
@@ -36,18 +36,20 @@ $httpClient = new HttpClient('your-api-key');
 $virusTotal = new Service($httpClient);
 
 //Password optional
+echo "Scanning until complete...\n";
 $response = $virusTotal->scanFileUntilCompleted('/path/to/file.zip');
 
 if ($response->isSuccessful()) {
 	$analyser = new FileAnalyser($response);
-	echo $analyser->isFileSafe() ? "File is safe!\n" : "File is malicious!\n";
 	try {
+		echo $analyser->getStatus() . "\n";
+		echo $analyser->isFileSafe() ? "File is safe!\n" : "File is malicious!\n";
 		echo $analyser->getFileSize() . "MB\n";
 	} catch (PropertyNotFoundException $e) {
-		echo $e->getMessage();
+		echo $e->getMessage() . "\n";
 	}
 } else {
-	echo $response->getErrorMessage();
+	echo $response->getErrorMessage() . "\n";
 }
 ```
 
@@ -71,15 +73,14 @@ if ($response->isSuccessful()) {
 		echo $analyser->isIpAddressSafe() ? "IP address is safe!\n" : "IP address is malicious!\n";
 		echo $analyser->getLastAnalysisDate() . "\n";
 	} catch (PropertyNotFoundException $e) {
-		echo $e->getMessage();
+		echo $e->getMessage() ."\n";
 	}
 } else {
-	echo $response->getErrorMessage();
+	echo $response->getErrorMessage() . "\n";
 }
 ```
 
 ## TODO
 
 - Add other methods found in the API.
-- Bulk out FileAnalyser.
 - POST file data to the endpoint, not just filesystem paths.

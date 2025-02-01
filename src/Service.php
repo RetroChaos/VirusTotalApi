@@ -80,22 +80,23 @@ class Service
 	 * Increment steps between each call. Defaults to 15s
 	 * @return FileReportResponse
 	 */
-	public function scanFileUntilCompleted(string $filePath, ?string $password = null, int $maxAttempts = 5, int $initialDelay = 0, int $step = 15): FileReportResponse
+	public function scanFileUntilCompleted(string $filePath, ?string $password = null, int $step = 15, int $maxAttempts = 5, int $initialDelay = 0): FileReportResponse
 	{
 		$fileResponse = $this->_fileApi->uploadFile($filePath, $password);
 
 		if (!$fileResponse->isSuccessful()) {
-			return new FileReportResponse(null, false, $fileResponse->getErrorMessage());
+			return new FileReportResponse($fileResponse->getRawData(), $fileResponse->getStatusCode(), $fileResponse->isSuccessful(), $fileResponse->getErrorMessage(), $fileResponse->getException());
 		}
 
 		$scanHelper = new ScanHelper();
 		try {
 			$id = $scanHelper->getFileId($fileResponse);
 		} catch (NoIdSetException|PropertyNotFoundException $e) {
-			return new FileReportResponse(null, false, $e->getMessage());
+			$exception  = ($e instanceof PropertyNotFoundException) ? 'PropertyNotFound' : 'NoIdSet';
+			return new FileReportResponse(null, 400, false, $e->getMessage(), $exception);
 		}
 
-		return $this->_fileApi->scanUntilCompleted($id, $maxAttempts, $initialDelay, $step);
+		return $this->_fileApi->scanUntilCompleted($id, $step, $maxAttempts, $initialDelay);
 	}
 
 	/**
