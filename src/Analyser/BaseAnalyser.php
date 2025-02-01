@@ -1,8 +1,8 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Analysers;
+namespace RetroChaos\VirusTotalApi\Analyser;
 
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
 
 class BaseAnalyser
 {

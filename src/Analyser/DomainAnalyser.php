@@ -1,10 +1,10 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Analysers;
+namespace RetroChaos\VirusTotalApi\Analyser;
 
 use Carbon\Carbon;
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
-use RetroChaos\VirusTotalApi\Responses\DomainResponse;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Response\DomainResponse;
 
 class DomainAnalyser extends BaseAnalyser
 {

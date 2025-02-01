@@ -2,9 +2,9 @@
 
 require 'vendor/autoload.php';
 
-use RetroChaos\VirusTotalApi\Analysers\DomainAnalyser;
+use RetroChaos\VirusTotalApi\Analyser\DomainAnalyser;
 use RetroChaos\VirusTotalApi\HttpClient;
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\Service;
 
 $httpClient = new HttpClient('your-api-key');

@@ -1,6 +1,6 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Exceptions;
+namespace RetroChaos\VirusTotalApi\Exception;
 
 /**
  * Exception thrown when an ID isn't set.

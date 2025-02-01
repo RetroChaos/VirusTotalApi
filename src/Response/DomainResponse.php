@@ -1,5 +1,5 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Responses;
+namespace RetroChaos\VirusTotalApi\Response;
 
 class DomainResponse extends BaseResponse {}

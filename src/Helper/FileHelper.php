@@ -1,6 +1,6 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Helpers;
+namespace RetroChaos\VirusTotalApi\Helper;
 
 class FileHelper
 {

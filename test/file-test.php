@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 
-use RetroChaos\VirusTotalApi\Analysers\FileAnalyser;
+use RetroChaos\VirusTotalApi\Analyser\FileAnalyser;
 use RetroChaos\VirusTotalApi\HttpClient;
 use RetroChaos\VirusTotalApi\Service;
 

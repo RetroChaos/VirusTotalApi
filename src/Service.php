@@ -2,15 +2,15 @@
 
 namespace RetroChaos\VirusTotalApi;
 
-use RetroChaos\VirusTotalApi\Analysers\FileAnalyser;
-use RetroChaos\VirusTotalApi\Exceptions\NoIdSetException;
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
-use RetroChaos\VirusTotalApi\Helpers\FileHelper;
-use RetroChaos\VirusTotalApi\Helpers\ScanHelper;
-use RetroChaos\VirusTotalApi\Responses\DomainResponse;
-use RetroChaos\VirusTotalApi\Responses\FileReportResponse;
-use RetroChaos\VirusTotalApi\Responses\FileResponse;
-use RetroChaos\VirusTotalApi\Responses\IpAddressResponse;
+use RetroChaos\VirusTotalApi\Analyser\FileAnalyser;
+use RetroChaos\VirusTotalApi\Exception\NoIdSetException;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Helper\FileHelper;
+use RetroChaos\VirusTotalApi\Helper\ScanHelper;
+use RetroChaos\VirusTotalApi\Response\DomainResponse;
+use RetroChaos\VirusTotalApi\Response\FileReportResponse;
+use RetroChaos\VirusTotalApi\Response\FileResponse;
+use RetroChaos\VirusTotalApi\Response\IpAddressResponse;
 
 class Service
 {

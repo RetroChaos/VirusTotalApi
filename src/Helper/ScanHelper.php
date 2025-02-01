@@ -1,12 +1,12 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Helpers;
+namespace RetroChaos\VirusTotalApi\Helper;
 
-use RetroChaos\VirusTotalApi\Analysers\FileAnalyser;
-use RetroChaos\VirusTotalApi\Exceptions\NoIdSetException;
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
-use RetroChaos\VirusTotalApi\Responses\FileReportResponse;
-use RetroChaos\VirusTotalApi\Responses\FileResponse;
+use RetroChaos\VirusTotalApi\Analyser\FileAnalyser;
+use RetroChaos\VirusTotalApi\Exception\NoIdSetException;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Response\FileReportResponse;
+use RetroChaos\VirusTotalApi\Response\FileResponse;
 
 class ScanHelper
 {

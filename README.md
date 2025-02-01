@@ -27,7 +27,7 @@ HttpClient -> Service -> Response -> Analyser
 Example script modified from ```test/file-test.php```
 
 ```php
-use RetroChaos\VirusTotalApi\Analysers\FileAnalyser;
+use RetroChaos\VirusTotalApi\Analyser\FileAnalyser;
 use RetroChaos\VirusTotalApi\HttpClient;
 use RetroChaos\VirusTotalApi\Service;
 
@@ -49,9 +49,9 @@ Another example is testing IP addresses:
 (Example script modified from ```test/ip-test.php```)
 
 ```php
-use RetroChaos\VirusTotalApi\Analysers\IpAddressAnalyser;
+use RetroChaos\VirusTotalApi\Analyser\IpAddressAnalyser;
 use RetroChaos\VirusTotalApi\HttpClient;
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\Service;
 
 $httpClient = new HttpClient('your-api-key');

@@ -1,8 +1,8 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Responses;
+namespace RetroChaos\VirusTotalApi\Response;
 
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
 
 class FileResponse extends BaseResponse {
 	/**
