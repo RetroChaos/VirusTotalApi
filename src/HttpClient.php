@@ -42,15 +42,23 @@ class HttpClient
 		];
 		try {
 			$response = $this->_client->request($method, $url, $options);
-			$return = json_decode($response->getBody()->getContents(), true);
-			$return['statusCode'] = $response->getStatusCode();
-			$return['success'] = true;
-			$return['message'] = '';
-			return $return;
+			$data = json_decode($response->getBody()->getContents(), true);
+			return [
+				'success' => true,
+				'error_message' => null,
+				'status_code' => $response->getStatusCode(),
+				'exception' => null,
+				'data' => $data['data'],
+			];
 		} catch (GuzzleException $e) {
+			$response = $e->getResponse();
+			$body = json_decode($response->getBody()->getContents());
 			return [
 				'success' => false,
-				'message' => $e->getMessage(),
+				'error_message' => $body->message,
+				'status_code' => $response->getStatusCode(),
+				'exception' => $body->code,
+				'data' => null,
 			];
 		}
 	}

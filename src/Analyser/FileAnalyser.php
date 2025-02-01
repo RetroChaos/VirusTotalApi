@@ -14,7 +14,7 @@ class FileAnalyser extends BaseAnalyser
 	 */
 	public function __construct(FileReportResponse $report)
 	{
-		$this->_report = $report->getRawResponse();
+		$this->_report = $report->getRawData();
 	}
 
 	/**
@@ -24,7 +24,7 @@ class FileAnalyser extends BaseAnalyser
 	 */
 	public function setReport(FileReportResponse $report): self
 	{
-		$this->_report = $report->getRawResponse();
+		$this->_report = $report->getRawData();
 		return $this;
 	}
 

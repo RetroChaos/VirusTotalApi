@@ -14,8 +14,8 @@ class ScanHelper
 	 * @param $fileId
 	 * Can either pass in a FileResponse to get the ID, or just pass the ID itself.
 	 * @return string
-	 * @throws NoIdSetException
 	 * @throws PropertyNotFoundException
+	 * @throws NoIdSetException
 	 */
 	public function getFileId($fileId): string
 	{

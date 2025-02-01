@@ -14,7 +14,7 @@ class DomainAnalyser extends BaseAnalyser
 	 */
 	public function __construct(DomainResponse $report)
 	{
-		$this->_report = $report->getRawResponse();
+		$this->_report = $report->getRawData();
 	}
 
 	/**
@@ -24,7 +24,7 @@ class DomainAnalyser extends BaseAnalyser
 	 */
 	public function setReport(DomainResponse $report): self
 	{
-		$this->_report = $report->getRawResponse();
+		$this->_report = $report->getRawData();
 		return $this;
 	}
 

@@ -14,7 +14,7 @@ class IpAddressAnalyser extends BaseAnalyser
 	 */
 	public function __construct(IpAddressResponse $report)
 	{
-		$this->_report = $report->getRawResponse();
+		$this->_report = $report->getRawData();
 	}
 
 	/**
@@ -24,7 +24,7 @@ class IpAddressAnalyser extends BaseAnalyser
 	 */
 	public function setReport(IpAddressResponse $report): self
 	{
-		$this->_report = $report->getRawResponse();
+		$this->_report = $report->getRawData();
 		return $this;
 	}
 

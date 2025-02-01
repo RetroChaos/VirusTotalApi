@@ -5,46 +5,60 @@ namespace RetroChaos\VirusTotalApi\Response;
 class BaseResponse
 {
 	/**
-	 * @var array|null $_response
+	 * @var array|null $_data
 	 */
-	protected ?array $_response = null;
+	protected ?array $_data;
 
 	/**
-	 * @var bool
+	 * @var int $_status
 	 */
-	protected bool $_success;
+	protected int $_status;
 
 	/**
-	 * @var string $_message
+	 * @var bool $_success
 	 */
-	protected string $_message = '';
+	protected bool $_success = true;
 
 	/**
-	 * @param array|null $response
+	 * @var string|null $_error_message
+	 */
+	protected ?string $_error_message = null;
+
+	/**
+	 * @var string|null
+	 */
+	protected ?string $_exception = null;
+
+	/**
+	 * @param array|null $data
+	 * @param int $status
 	 * @param bool $success
-	 * @param string $message
+	 * @param string|null $message
+	 * @param string|null $exception
 	 */
-	public function __construct(?array $response, bool $success = true, string $message = '')
+	public function __construct(?array $data, int $status, bool $success = true, ?string $message = null, ?string $exception = null)
 	{
-		$this->_response = $response;
+		$this->_data = $data;
+		$this->_status = $status;
 		$this->_success = $success;
-		$this->_message = $message;
+		$this->_error_message = $message;
+		$this->_exception = $exception;
 	}
 
 	/**
 	 * @return array|null
 	 */
-	public function getRawResponse(): ?array
+	public function getRawData(): ?array
 	{
-		return $this->_response;
+		return $this->_data;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getJsonResponse(): string
+	public function getJsonData(): string
 	{
-		return json_encode($this->_response);
+		return json_encode($this->_data);
 	}
 
 	/**
@@ -56,10 +70,27 @@ class BaseResponse
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	public function getErrorMessage(): string
+	public function getErrorMessage(): ?string
 	{
-		return $this->_message;
+		return $this->_error_message;
 	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getException(): ?string
+	{
+		return $this->_exception;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getStatusCode(): int
+	{
+		return $this->_status;
+	}
+
 }
