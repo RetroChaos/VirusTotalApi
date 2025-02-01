@@ -158,4 +158,13 @@ class FileAnalyser extends BaseAnalyser
 	{
 		return Carbon::createFromTimestamp($this->_getAttribute('date'), 'UTC')->toDateTimeString();
 	}
+
+	/**
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	public function getFileId(): string
+	{
+		return $this->_getAttribute('id');
+	}
 }

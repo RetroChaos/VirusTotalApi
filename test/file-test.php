@@ -3,7 +3,6 @@
 require 'vendor/autoload.php';
 
 use RetroChaos\VirusTotalApi\Analysers\FileAnalyser;
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\HttpClient;
 use RetroChaos\VirusTotalApi\Service;
 

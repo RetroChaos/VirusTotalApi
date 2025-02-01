@@ -2,8 +2,11 @@
 
 namespace RetroChaos\VirusTotalApi;
 
+use RetroChaos\VirusTotalApi\Analysers\FileAnalyser;
+use RetroChaos\VirusTotalApi\Exceptions\NoIdSetException;
 use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\Helpers\FileHelper;
+use RetroChaos\VirusTotalApi\Helpers\ScanHelper;
 use RetroChaos\VirusTotalApi\Responses\DomainResponse;
 use RetroChaos\VirusTotalApi\Responses\FileReportResponse;
 use RetroChaos\VirusTotalApi\Responses\FileResponse;
@@ -69,15 +72,16 @@ class Service
 	}
 
 	/**
+	 * Uploads a file to VirusTotal for scanning
 	 * @param string $filePath
 	 * @param string|null $password
-	 * @return FileReportResponse
+	 * @return FileResponse
 	 */
-	public function scanFile(string $filePath, ?string $password = null): FileReportResponse
+	public function uploadForScanning(string $filePath, ?string $password = null): FileResponse
 	{
 		$fileHandler = new FileHelper();
 		if (!$fileHandler->isFileSizeValid($filePath)) {
-			return new FileReportResponse(null, false, 'File size too large. Max 200MB allowed.');
+			return new FileResponse(null, false, 'File size too large. Max 200MB allowed.');
 		}
 
 		$uploadUrl = 'files';
@@ -90,16 +94,82 @@ class Service
 		]);
 
 		if ($response['success']) {
-			$fileResponse = new	FileResponse($response);
+			return new FileResponse($response);
 		} else {
-			return new FileReportResponse(null, false, $response['message']);
+			return new FileResponse(null, false, $response['message']);
+		}
+	}
+
+	/**
+	 * Scans a file, doesn't wait until the status is 'completed'
+	 * @param string $filePath
+	 * @param string|null $password
+	 * @return FileReportResponse
+	 */
+	public function scanFile(string $filePath, ?string $password = null): FileReportResponse
+	{
+		$fileResponse = $this->uploadForScanning($filePath, $password);
+
+		if (!$fileResponse->isSuccessful()) {
+			return new FileReportResponse(null, false, $fileResponse->getErrorMessage());
 		}
 
+		$scanHelper = new ScanHelper();
 		try {
-			return $this->getFileReport($fileResponse->getFileAnalysisId());
+			$id = $scanHelper->getFileId($fileResponse);
+		} catch (NoIdSetException|PropertyNotFoundException $e) {
+			return new FileReportResponse(null, false, $e->getMessage());
+		}
+
+		return $this->getFileReport($id);
+	}
+
+	/**
+	 * @param string $id
+	 * @param int $sleep
+	 * Sleeps by default for 15s as the free version of VirusTotal API only allows 5 requests per minute!
+	 * @return FileReportResponse
+	 */
+	public function scanUntilCompleted(string $id, int $sleep = 15): FileReportResponse
+	{
+		try {
+			$report = $this->getFileReport($id);
+			$analyser = new FileAnalyser($report);
+			$status = $analyser->getStatus();
+			while ($status !== 'completed') {
+				sleep($sleep);
+				$report = $this->getFileReport($id);
+				$analyser->setReport($report);
+				$status = $analyser->getStatus();
+			}
+			return new FileReportResponse($report->getRawResponse());
 		} catch (PropertyNotFoundException $e) {
 			return new FileReportResponse(null, false, 'File report not found!');
 		}
+	}
+
+	/**
+	 * @param string $filePath
+	 * @param string|null $password
+	 * @param int $sleep Sleeps by default for 15s as the free version of VirusTotal API only allows 5 requests per minute!
+	 * @return FileReportResponse
+	 */
+	public function scanFileUntilCompleted(string $filePath, ?string $password = null, int $sleep = 15): FileReportResponse
+	{
+		$fileResponse = $this->uploadForScanning($filePath, $password);
+
+		if (!$fileResponse->isSuccessful()) {
+			return new FileReportResponse(null, false, $fileResponse->getErrorMessage());
+		}
+
+		$scanHelper = new ScanHelper();
+		try {
+			$id = $scanHelper->getFileId($fileResponse);
+		} catch (NoIdSetException|PropertyNotFoundException $e) {
+			return new FileReportResponse(null, false, $e->getMessage());
+		}
+
+		return $this->scanUntilCompleted($id, $sleep);
 	}
 
 	/**

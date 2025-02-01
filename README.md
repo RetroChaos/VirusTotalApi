@@ -28,7 +28,6 @@ Example script modified from ```test/file-test.php```
 
 ```php
 use RetroChaos\VirusTotalApi\Analysers\FileAnalyser;
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\HttpClient;
 use RetroChaos\VirusTotalApi\Service;
 
@@ -36,7 +35,7 @@ $httpClient = new HttpClient('your-api-key');
 $virusTotal = new Service($httpClient);
 
 //Password optional
-$response = $virusTotal->scanFile('/path/to/file.zip');
+$response = $virusTotal->scanFileUntilCompleted('/path/to/file.zip');
 
 if ($response->isSuccessful()) {
 	$analyser = new FileAnalyser($response);
@@ -51,8 +50,8 @@ Another example is testing IP addresses:
 
 ```php
 use RetroChaos\VirusTotalApi\Analysers\IpAddressAnalyser;
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\HttpClient;
+use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
 use RetroChaos\VirusTotalApi\Service;
 
 $httpClient = new HttpClient('your-api-key');
