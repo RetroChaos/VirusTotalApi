@@ -2,19 +2,32 @@
 
 namespace RetroChaos\VirusTotalApi;
 
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
-use RetroChaos\VirusTotalApi\Helpers\FileHelper;
-use RetroChaos\VirusTotalApi\Responses\DomainResponse;
-use RetroChaos\VirusTotalApi\Responses\FileReportResponse;
-use RetroChaos\VirusTotalApi\Responses\FileResponse;
-use RetroChaos\VirusTotalApi\Responses\IpAddressResponse;
+use RetroChaos\VirusTotalApi\Api\DomainApi;
+use RetroChaos\VirusTotalApi\Api\FileApi;
+use RetroChaos\VirusTotalApi\Api\IpApi;
+use RetroChaos\VirusTotalApi\Exception\NoIdSetException;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Helper\ScanHelper;
+use RetroChaos\VirusTotalApi\Response\DomainResponse;
+use RetroChaos\VirusTotalApi\Response\FileReportResponse;
+use RetroChaos\VirusTotalApi\Response\IpAddressResponse;
 
 class Service
 {
 	/**
-	 * @var HttpClient $_httpClient
+	 * @var FileApi $_fileApi
 	 */
-	private HttpClient $_httpClient;
+	private FileApi $_fileApi;
+
+	/**
+	 * @var DomainApi
+	 */
+	private DomainApi $_domainApi;
+
+	/**
+	 * @var IpApi $_ipApi
+	 */
+	private IpApi $_ipApi;
 
 	/**
 	 * The main service class handling API calls.
@@ -22,66 +35,68 @@ class Service
 	 */
 	public function __construct(HttpClient $httpClient)
 	{
-		$this->_httpClient = $httpClient;
+		$this->_fileApi = new FileApi($httpClient);
+		$this->_domainApi = new DomainApi($httpClient);
+		$this->_ipApi = new IpApi($httpClient);
 	}
 
 	/**
-	 * Gets the upload URL fpr large files.
-	 * @return string
-	 */
-	public function getLargeUploadUrl(): string
-	{
-		$response = $this->_httpClient->request('GET', 'files/upload_url');
-		return $response['success'] ? $response['data'] : '';
-	}
-
-	/**
-	 * Gets the analysis report of a file.
-	 * @param string $analysisId
-	 * @return FileReportResponse
-	 */
-	public function getFileReport(string $analysisId): FileReportResponse
-	{
-		$response = $this->_httpClient->request('GET', "analyses/$analysisId");
-		if ($response['success']) {
-			return new FileReportResponse($response);
-		} else {
-			return new FileReportResponse(null, false, $response['message']);
-		}
-	}
-
-	/**
+	 * Scans a file, doesn't wait until the status is 'completed'.
 	 * @param string $filePath
+	 * The absolute filepath
 	 * @param string|null $password
+	 * Password optional
 	 * @return FileReportResponse
 	 */
 	public function scanFile(string $filePath, ?string $password = null): FileReportResponse
 	{
-		$fileHandler = new FileHelper();
-		if (!$fileHandler->isFileSizeValid($filePath)) {
-			return new FileReportResponse(null, false, 'File size too large. Max 200MB allowed.');
+		$fileResponse = $this->_fileApi->uploadFile($filePath, $password);
+
+		if (!$fileResponse->isSuccessful()) {
+			return new FileReportResponse(null, false, $fileResponse->getErrorMessage());
 		}
 
-		$uploadUrl = 'files';
-		if ($fileHandler->isLargeFile($filePath)) {
-			$uploadUrl = $this->getLargeUploadUrl();
-		}
-
-		$response = $this->_httpClient->request('POST', $uploadUrl, [
-			'multipart' => $fileHandler->prepareMultipartData($filePath, $password),
-		]);
-
-		if ($response['success']) {
-			$fileResponse = new	FileResponse($response);
-		} else {
-			return new FileReportResponse(null, false, $response['message']);
-		}
-
+		$scanHelper = new ScanHelper();
 		try {
-			return $this->getFileReport($fileResponse->getFileAnalysisId());
-		} catch (PropertyNotFoundException $e) {
-			return new FileReportResponse(null, false, 'File report not found!');
+			$id = $scanHelper->getFileId($fileResponse);
+		} catch (NoIdSetException|PropertyNotFoundException $e) {
+			return new FileReportResponse(null, false, $e->getMessage());
 		}
+
+		return $this->_fileApi->getFileReport($id);
+	}
+
+	/**
+	 * Scans a file, waits until the status is 'completed'.
+	 * @param string $filePath
+	 * The absolute filepath
+	 * @param string|null $password
+	 * Password optional.
+	 * @param int $maxAttempts
+	 * Max attempts before failure.
+	 * @param int $initialDelay
+	 * Offset before starting scanning. Defaults to zero.
+	 * @param int $step
+	 * Increment steps between each call. Defaults to 15s
+	 * @return FileReportResponse
+	 */
+	public function scanFileUntilCompleted(string $filePath, ?string $password = null, int $step = 15, int $maxAttempts = 5, int $initialDelay = 0): FileReportResponse
+	{
+		$fileResponse = $this->_fileApi->uploadFile($filePath, $password);
+
+		if (!$fileResponse->isSuccessful()) {
+			return new FileReportResponse($fileResponse->getRawData(), $fileResponse->getStatusCode(), $fileResponse->isSuccessful(), $fileResponse->getErrorMessage(), $fileResponse->getException());
+		}
+
+		$scanHelper = new ScanHelper();
+		try {
+			$id = $scanHelper->getFileId($fileResponse);
+		} catch (NoIdSetException|PropertyNotFoundException $e) {
+			$exception  = ($e instanceof PropertyNotFoundException) ? 'PropertyNotFound' : 'NoIdSet';
+			return new FileReportResponse(null, 400, false, $e->getMessage(), $exception);
+		}
+
+		return $this->_fileApi->scanUntilCompleted($id, $step, $maxAttempts, $initialDelay);
 	}
 
 	/**
@@ -90,12 +105,7 @@ class Service
 	 */
 	public function scanIpAddress(string $ipAddress): IpAddressResponse
 	{
-		$response = $this->_httpClient->request('GET', "ip_addresses/$ipAddress");
-		if ($response['success']) {
-			return new IpAddressResponse($response);
-		} else {
-			return new IpAddressResponse(null, false, $response['message']);
-		}
+		return $this->_ipApi->getIpReport($ipAddress);
 	}
 
 	/**
@@ -104,11 +114,42 @@ class Service
 	 */
 	public function scanDomain(string $domain): DomainResponse
 	{
-		$response = $this->_httpClient->request('GET', "domains/$domain");
-		if ($response['success']) {
-			return new DomainResponse($response);
-		} else {
-			return new DomainResponse(null, false, $response['message']);
-		}
+		return $this->_domainApi->getDomainReport($domain);
+	}
+
+	/**
+	 * @param string $domain
+	 * @return void
+	 */
+	public function addHarmlessDomainVote(string $domain): void
+	{
+		$this->_domainApi->voteDomain($domain, false);
+	}
+
+	/**
+	 * @param string $domain
+	 * @return void
+	 */
+	public function addMaliciousDomainVote(string $domain): void
+	{
+		$this->_domainApi->voteDomain($domain, true);
+	}
+
+	/**
+	 * @param string $ipAddress
+	 * @return void
+	 */
+	public function addHarmlessIpVote(string $ipAddress): void
+	{
+		$this->_ipApi->voteIp($ipAddress, false);
+	}
+
+	/**
+	 * @param string $ipAddress
+	 * @return void
+	 */
+	public function addMaliciousIpVote(string $ipAddress): void
+	{
+		$this->_ipApi->voteIp($ipAddress, true);
 	}
 }

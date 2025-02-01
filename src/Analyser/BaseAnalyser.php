@@ -1,8 +1,8 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Analysers;
+namespace RetroChaos\VirusTotalApi\Analyser;
 
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
 
 class BaseAnalyser
 {
@@ -33,7 +33,7 @@ class BaseAnalyser
 	protected function _getVotes(string $key): int
 	{
 		if (!isset($this->_report['data']['attributes']['total_votes'][$key])) {
-			throw new PropertyNotFoundException("$key not found in the report!");
+			throw new PropertyNotFoundException("$key count not found in the report!");
 		}
 
 		return $this->_report['data']['attributes']['total_votes'][$key];
@@ -64,5 +64,18 @@ class BaseAnalyser
 			throw new PropertyNotFoundException("$key count not found in the report!");
 		}
 		return $this->_report['data']['attributes']['stats'][$key];
+	}
+
+	/**
+	 * @param string $key
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	protected function _getFileInfo(string $key): string
+	{
+		if (!isset($this->_report['meta']['file_info'][$key])) {
+			throw new PropertyNotFoundException("$key not found in the report!");
+		}
+		return $this->_report['meta']['file_info'][$key];
 	}
 }

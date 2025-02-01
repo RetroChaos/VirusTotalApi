@@ -1,9 +1,10 @@
 <?php
 
-namespace RetroChaos\VirusTotalApi\Analysers;
+namespace RetroChaos\VirusTotalApi\Analyser;
 
-use RetroChaos\VirusTotalApi\Exceptions\PropertyNotFoundException;
-use RetroChaos\VirusTotalApi\Responses\FileReportResponse;
+use Carbon\Carbon;
+use RetroChaos\VirusTotalApi\Exception\PropertyNotFoundException;
+use RetroChaos\VirusTotalApi\Response\FileReportResponse;
 
 class FileAnalyser extends BaseAnalyser
 {
@@ -13,17 +14,17 @@ class FileAnalyser extends BaseAnalyser
 	 */
 	public function __construct(FileReportResponse $report)
 	{
-		$this->_report = $report->getRawResponse();
+		$this->_report = $report->getRawData();
 	}
 
 	/**
 	 * In case you need to change the report response but don't necessarily want to create a new analyser object.
 	 * @param FileReportResponse $report
-	 * @return $this
+	 * @return self
 	 */
 	public function setReport(FileReportResponse $report): self
 	{
-		$this->_report = $report->getRawResponse();
+		$this->_report = $report->getRawData();
 		return $this;
 	}
 
@@ -41,6 +42,7 @@ class FileAnalyser extends BaseAnalyser
 	}
 
 	/**
+	 * @return int
 	 * @throws PropertyNotFoundException
 	 */
 	public function getMaliciousCount(): int
@@ -49,6 +51,7 @@ class FileAnalyser extends BaseAnalyser
 	}
 
 	/**
+	 * @return int
 	 * @throws PropertyNotFoundException
 	 */
 	public function getSuspiciousCount(): int
@@ -57,6 +60,7 @@ class FileAnalyser extends BaseAnalyser
 	}
 
 	/**
+	 * @return int
 	 * @throws PropertyNotFoundException
 	 */
 	public function getUndetectedCount(): int
@@ -65,6 +69,7 @@ class FileAnalyser extends BaseAnalyser
 	}
 
 	/**
+	 * @return int
 	 * @throws PropertyNotFoundException
 	 */
 	public function getHarmlessCount(): int
@@ -73,6 +78,7 @@ class FileAnalyser extends BaseAnalyser
 	}
 
 	/**
+	 * @return int
 	 * @throws PropertyNotFoundException
 	 */
 	public function getTimeoutCount(): int
@@ -81,6 +87,7 @@ class FileAnalyser extends BaseAnalyser
 	}
 
 	/**
+	 * @return int
 	 * @throws PropertyNotFoundException
 	 */
 	public function getFailureCount(): int
@@ -89,10 +96,75 @@ class FileAnalyser extends BaseAnalyser
 	}
 
 	/**
+	 * @return int
 	 * @throws PropertyNotFoundException
 	 */
 	public function getTypeUnsupportedCount(): int
 	{
 		return $this->_getStat('type-unsupported');
+	}
+
+	/**
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	public function getSha256(): string
+	{
+		return $this->_getFileInfo('sha256');
+	}
+
+	/**
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	public function getMd5(): string
+	{
+		return $this->_getFileInfo('md5');
+	}
+
+	/**
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	public function getSha1(): string
+	{
+		return $this->_getFileInfo('sha1');
+	}
+
+	/**
+	 * Returns the filesize in Megabytes.
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	public function getFileSize(): string
+	{
+		return number_format(($this->_getFileInfo('size') / (1024 ** 2)), 2);
+	}
+
+	/**
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	public function getStatus(): string
+	{
+		return $this->_getAttribute('status');
+	}
+
+	/**
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	public function getDate(): string
+	{
+		return Carbon::createFromTimestamp($this->_getAttribute('date'), 'UTC')->toDateTimeString();
+	}
+
+	/**
+	 * @return string
+	 * @throws PropertyNotFoundException
+	 */
+	public function getFileId(): string
+	{
+		return $this->_getAttribute('id');
 	}
 }
