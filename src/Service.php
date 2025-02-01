@@ -152,4 +152,51 @@ class Service
 	{
 		$this->_ipApi->voteIp($ipAddress, true);
 	}
+
+	/**
+	 * @param string $id
+	 * Must either be SHA-256, SHA-1 or MD5 hash identifying the file.
+	 * Easy to pass the id returned from FileAnalyser::getFileId()
+	 * @return void
+	 */
+	public function addHarmlessFileVote(string $id): void
+	{
+		$this->_fileApi->voteFile($id, false);
+	}
+
+	/**
+	 * @param string $id
+	 * Must either be SHA-256, SHA-1 or MD5 hash identifying the file.
+	 * Easy to pass the id returned from FileAnalyser::getFileId()
+	 * @return void
+	 */
+	public function addMaliciousFileVote(string $id): void
+	{
+		$this->_fileApi->voteFile($id, true);
+	}
+
+	/**
+	 * @param string $domain
+	 * @return void
+	 */
+	public function rescanDomain(string $domain): void
+	{
+		$this->_domainApi->rescanDomain($domain);
+	}
+
+	public function rescanIp(string $ipAddress): void
+	{
+		$this->_ipApi->rescanIpAddress($ipAddress);
+	}
+
+	/**
+	 * @param string $id
+	 * Must either be SHA-256, SHA-1 or MD5 hash identifying the file.
+	 * Easy to pass the id returned from FileAnalyser::getFileId()
+	 * @return void
+	 */
+	public function rescanFile(string $id): void
+	{
+		$this->_fileApi->rescanFile($id);
+	}
 }

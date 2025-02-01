@@ -23,4 +23,13 @@ class IpApi extends BaseApi
 			"headers" => ['Content-Type' => 'application/json'],
 		]);
 	}
+
+	/**
+	 * @param string $ipAddress
+	 * @return void
+	 */
+	public function rescanIpAddress(string $ipAddress): void
+	{
+		$this->_httpClient->request('POST', "ip_addresses/$ipAddress/analyse");
+	}
 }

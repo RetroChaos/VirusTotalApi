@@ -89,4 +89,25 @@ class FileApi extends BaseApi
 		}
 	}
 
+	/**
+	 * @param string $id
+	 * @param bool $isMalicious
+	 * @return void
+	 */
+	public function voteFile(string $id, bool $isMalicious): void
+	{
+		$this->_httpClient->request('POST', "files/$id/votes", [
+			"body" => json_encode($isMalicious ? self::MALICIOUS_VOTE_BODY : self::HARMLESS_VOTE_BODY),
+			"headers" => ['Content-Type' => 'application/json'],
+		]);
+	}
+
+	/**
+	 * @param string $id
+	 * @return void
+	 */
+	public function rescanFile(string $id): void
+	{
+		$this->_httpClient->request('POST', "files/$id/analyse");
+	}
 }

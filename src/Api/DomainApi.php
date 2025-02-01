@@ -23,4 +23,13 @@ class DomainApi extends BaseApi
 			"headers" => ['Content-Type' => 'application/json'],
 		]);
 	}
+
+	/**
+	 * @param string $domain
+	 * @return void
+	 */
+	public function rescanDomain(string $domain): void
+	{
+		$this->_httpClient->request('POST', "domains/$domain/analyse");
+	}
 }
